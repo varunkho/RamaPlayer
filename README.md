@@ -1,7 +1,7 @@
 ﻿Introduction
 --------------------
 
-RamaPlayer is a lightweight media player for Windows that is operated exclusively through the keyboard. The interface is simple -- the player occupies the entire app window and the task bar at the bottom shows current position (if playing).
+RamaPlayer is a lightweight media player for Windows that is operated exclusively through the keyboard. The interface is simple -- the player occupies the entire app window and the status bar at the bottom shows current position (if playing).
 
 One unique quality of RamaPlayer is the ability to auto switch to the next track in the current folder (determined by a simple alphabetic order) as the current track finishes. SO this is great to use with tracks which have to be played in a sequence without having to create playlist etc. At the end of the last track, it restarts with the first track!
 
