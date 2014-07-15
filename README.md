@@ -5,9 +5,11 @@ RamaPlayer is a lightweight media player for Windows that is operated exclusivel
 
 One unique quality of RamaPlayer is the ability to auto switch to the next track in the current folder (determined by a simple alphabetic order) as the current track finishes. SO this is great to use with tracks which have to be played in a sequence without having to create playlist etc. At the end of the last track, it restarts with the first track!
 
-Another distinguishing quality is the multiple keyboard commands to rewind/forward from a very small time distance to a very large one (see below).
+Another distinguishing quality is the multiple keyboard commands to rewind/forward by a very small time distance to by a very large one (see below).
 
 RamaPlayer can play anything what Windows Media Player  can -- nothing more and nothing less. It actually uses latter's ActiveX component for playback (did you expect another playback software from scratch? Sorry to disappoint you!)
+
+To configure RamaPlayer as the default program for a media extension, simply right click on a file with that extension, choose 'Open With ....', brows to the RamaPlayer executable and finally check the box 'Always use the selected program to open this kind of file' and then hit Ok. From next time Windows will open such type of files in RamaPlayer as you doubleclick or press enter on them.
 
 Keyboard Commands
 --------------------
