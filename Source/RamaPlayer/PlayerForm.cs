@@ -94,7 +94,8 @@ namespace RamaPlayer
 		{
 			if (axWindowsMediaPlayer1.Ctlcontrols != null && axWindowsMediaPlayer1.Ctlcontrols.currentItem != null)
 			{
-				StatusLabel.Text = string.Format("{0}% of {1:H:mm:ss}{2}",
+				StatusLabel.Text = string.Format("{0:H:m:s} ({1}% of {2:H:mm:ss}) {3}",
+					new DateTime(TimeSpan.FromSeconds(axWindowsMediaPlayer1.Ctlcontrols.currentPosition).Ticks),
 					axWindowsMediaPlayer1.Ctlcontrols.currentPosition == 0 ? 0 : (int)(axWindowsMediaPlayer1.Ctlcontrols.currentPosition / (axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration / 100)),
 					new DateTime(TimeSpan.FromSeconds(axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration).Ticks),
 					isRepeating ? "(Repeating)" : string.Empty);
