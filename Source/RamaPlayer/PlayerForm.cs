@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibVLCSharp.Shared;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -22,6 +23,9 @@ namespace RamaPlayer
 		private Task statusUpdateWorker;
 		private bool isRepeating;
 
+		private LibVLC _libVLC;
+		private MediaPlayer _mp;
+
 		private string _cfile;
 		private string CurrentFile
 		{
@@ -41,27 +45,33 @@ namespace RamaPlayer
 
 		public PlayerForm(string filePath)
 		{
+			Core.Initialize();
+
 			this.WindowState = FormWindowState.Maximized;
 			InitializeComponent();
 
-			axWindowsMediaPlayer1.PreviewKeyDown += WM_PreviewKeyDown;
-			axWindowsMediaPlayer1.uiMode = "none";
-			axWindowsMediaPlayer1.stretchToFit = true;
-			axWindowsMediaPlayer1.KeyDownEvent += WM_KeyDownEvent;
-			axWindowsMediaPlayer1.PlayStateChange += WM_PlayStateChange;
-			axWindowsMediaPlayer1.PositionChange += WM_PositionChange;
+
+			_libVLC = new LibVLC();
+			_mp = new MediaPlayer(_libVLC);
+			videoView1.MediaPlayer = _mp;
+			videoView1.PreviewKeyDown += WM_PreviewKeyDown;
+			//_mp.uiMode = "none";
+			//_mp.stretchToFit = true;
+			videoView1.KeyDown += WM_KeyDownEvent;
+			_mp.TimeChanged += Media_TimeChange;
 			if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
 				InitializeNewLocation(filePath);
 
 			this.FormClosing += PlayerForm_FormClosing;
 			statusUpdateWorker = Task.Factory.StartNew(() =>
 				{
+					return;
 					while (!imClosing)
 					{
 						Thread.Sleep(200);
 						try
 						{
-							WM_PositionChange(null, null);
+							Media_TimeChange(null, null);
 						}
 						catch (Exception Exception) { }
 					}
@@ -81,66 +91,60 @@ namespace RamaPlayer
 		void PlayerForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			this.imClosing = true;
-			if (axWindowsMediaPlayer1.fullScreen)
+			if (_mp.Fullscreen)
 			{
-				axWindowsMediaPlayer1.fullScreen = false;
+				_mp.Fullscreen = false;
 			}
 
-			statusUpdateWorker.Wait();
+			statusUpdateWorker.Wait(500);
 			Application.DoEvents();
 		}
 
-		void WM_PositionChange(object sender, AxWMPLib._WMPOCXEvents_PositionChangeEvent e)
+		void Media_TimeChange(object sender, MediaPlayerTimeChangedEventArgs e)
 		{
-			if (axWindowsMediaPlayer1.Ctlcontrols != null && axWindowsMediaPlayer1.Ctlcontrols.currentItem != null)
+			string status = "";
+			if (_mp.Media != null && _mp.Length > 0)
 			{
-				StatusLabel.Text = string.Format("{0:H:m:s} ({1}% of {2:H:mm:ss}) {3}",
-					new DateTime(TimeSpan.FromSeconds(axWindowsMediaPlayer1.Ctlcontrols.currentPosition).Ticks),
-					axWindowsMediaPlayer1.Ctlcontrols.currentPosition == 0 ? 0 : (int)(axWindowsMediaPlayer1.Ctlcontrols.currentPosition / (axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration / 100)),
-					new DateTime(TimeSpan.FromSeconds(axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration).Ticks),
+				status = string.Format("{0:H:m:s} ({1}% of {2:H:mm:ss}) {3}",
+					new DateTime(TimeSpan.FromMilliseconds(_mp.Time).Ticks),
+					_mp.Time == 0 ? 0 : (int)(_mp.Time / (_mp.Length / 100)),
+					new DateTime(TimeSpan.FromMilliseconds(_mp.Length).Ticks),
 					isRepeating ? "(Repeating)" : string.Empty);
 			}
 			else
 			{
-				StatusLabel.Text = "Not Playing";
+				status = "Not Playing";
 			}
+
+			StatusLabel.BeginInvoke(new Action(() => StatusLabel.Text = status));
 		}
 
-		bool moveToNext = false;
-		void WM_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
+		void Media_StateChanged(object sender, LibVLCSharp.Shared.MediaStateChangedEventArgs e)
 		{
-			switch ((WMPPlayState)e.newState)
+			BeginInvoke(new Action(() =>
 			{
-				case WMPPlayState.wmppsMediaEnded:
-					if (isRepeating)
-					{
-						Task.Factory.StartNew(() =>
+				switch (e.State)
+				{
+					case VLCState.Ended:
+						if (isRepeating)
 						{
-							Thread.Sleep(500);
-							axWindowsMediaPlayer1.Invoke(new Action(() => axWindowsMediaPlayer1.Ctlcontrols.play()));
-						});
-					}
-					else
-					{
-						moveToNext = true;
-					}
-					break;
-				case WMPPlayState.wmppsStopped:
-					if (moveToNext)
-					{
-						moveToNext = false;
-						Next();
-						Task.Factory.StartNew(() =>
+							_mp.Play();
+						}
+						else
 						{
-							Thread.Sleep(500);
-							axWindowsMediaPlayer1.Invoke(new Action(() => axWindowsMediaPlayer1.Ctlcontrols.play()));
-						});
-					}
-					break;
-			}
+							Next();
+							//Task.Factory.StartNew(() =>
+							//{
+							//	Thread.Sleep(500);
+							//	videoView1.Invoke(new Action(() => _mp.Play()));
+							//});
+						}
+						break;
+				}
+			}));
 		}
 
-		void WM_KeyDownEvent(object sender, AxWMPLib._WMPOCXEvents_KeyDownEvent e)
+		void WM_KeyDownEvent(object sender, KeyEventArgs e)
 		{
 			// Though this event should always follow the previewkeydown event, yet we make it so as to handle cases in which fullscreen is active and focus is on that.
 			// Following variable will be true if previewkeydown did process this keystroke.
@@ -184,6 +188,7 @@ namespace RamaPlayer
 				})
 				.Select(f => Path.GetFileName(f))
 				.ToList();
+
 		}
 
 		void Next()
@@ -211,50 +216,54 @@ namespace RamaPlayer
 			lock (this)
 			{
 				this.Text = this.CurrentFile + " Rama Player";
-				axWindowsMediaPlayer1.currentMedia = axWindowsMediaPlayer1.newMedia(this.currentFolder + @"\" + this.CurrentFile);
-				axWindowsMediaPlayer1.settings.mute = false;
+				_mp.Media = null;
+				var media = new Media(_libVLC, $@"{this.currentFolder}\{this.CurrentFile}", FromType.FromPath);
+				media.StateChanged += Media_StateChanged;
+				_mp.Media = media;
+				_mp.Play();
+				_mp.Mute = false;
 			}
 		}
 
 		void ProcessKeyInput(KeyInputEventArgs e)
 		{
-			if (axWindowsMediaPlayer1.Ctlcontrols.currentItem != null)
+			if (_mp.Media != null && _mp.Length > 0)
 			{
-				int offset = e.Shift && e.Control ? 60 : e.Control ? 40 : e.Alt ? 15 : 4;
-				var Offset20 = axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration / 100 * 20;
+				int offset = (e.Shift && e.Control ? 60 : e.Control ? 40 : e.Alt ? 15 : 4) * 1000;
+				var Offset20 = _mp.Length / 100 * 20;
 				switch (e.KeyCode)
 				{
 					case Keys.Left:
-						axWindowsMediaPlayer1.Ctlcontrols.currentPosition -= offset;
+						_mp.Time = (_mp.Time - offset) < 0 ? 0 : _mp.Time - offset;
 						break;
 					case Keys.Right:
-						axWindowsMediaPlayer1.Ctlcontrols.currentPosition += offset;
+						_mp.Time = (_mp.Time + offset) > _mp.Length ? _mp.Length : _mp.Time + offset;
 						break;
 
 					case Keys.PageUp:
-						axWindowsMediaPlayer1.Ctlcontrols.currentPosition = axWindowsMediaPlayer1.Ctlcontrols.currentPosition < Offset20 ? 0 : axWindowsMediaPlayer1.Ctlcontrols.currentPosition - Offset20;
+						_mp.Time = _mp.Time < Offset20 ? 0 : _mp.Time - Offset20;
 						break;
 					case Keys.PageDown:
-						axWindowsMediaPlayer1.Ctlcontrols.currentPosition = axWindowsMediaPlayer1.Ctlcontrols.currentPosition + Offset20 > axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration ? axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration : axWindowsMediaPlayer1.Ctlcontrols.currentPosition + Offset20;
+						_mp.Time = (_mp.Time + Offset20) > _mp.Length ? _mp.Length : _mp.Time + Offset20;
 						break;
 
 					case Keys.Up:
-						axWindowsMediaPlayer1.settings.volume += 1;
+						_mp.Volume += 1;
 						break;
 					case Keys.Down:
-						axWindowsMediaPlayer1.settings.volume -= 1;
+						_mp.Volume -= 1;
 						break;
 
 					case Keys.M:
-						axWindowsMediaPlayer1.settings.mute = !axWindowsMediaPlayer1.settings.mute;
+						_mp.Mute = !_mp.Mute;
 						break;
 
 					case Keys.P:
 					case Keys.Space:
-						if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
-							axWindowsMediaPlayer1.Ctlcontrols.pause();
+						if (_mp.State == VLCState.Playing)
+							_mp.Pause();
 						else
-							axWindowsMediaPlayer1.Ctlcontrols.play();
+							_mp.Play();
 						break;
 
 					case Keys.W:
@@ -264,25 +273,25 @@ namespace RamaPlayer
 						Next();
 						break;
 					case Keys.Home:
-						axWindowsMediaPlayer1.Ctlcontrols.currentPosition = 0;
+						_mp.Time = 0;
 						break;
 					case Keys.End:
-						axWindowsMediaPlayer1.Ctlcontrols.currentPosition = axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration;
+						_mp.Time = _mp.Length;
 						break;
 
 					case Keys.F:
-						if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying || axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPaused)
+						if (_mp.State == VLCState.Playing || _mp.State == VLCState.Paused)
 						{
-							axWindowsMediaPlayer1.fullScreen = !axWindowsMediaPlayer1.fullScreen;
+							_mp.Fullscreen = !_mp.Fullscreen;
 							// Focussing was primarily intended as fullscreen is turned off; however, it did the trick for arrow keys not functioning in fullscreen mode! Preview keydown rocks!
-							axWindowsMediaPlayer1.Focus();
+							videoView1.Focus();
 						}
 						break;
 					case Keys.Escape:
-						if (axWindowsMediaPlayer1.fullScreen)
-							axWindowsMediaPlayer1.fullScreen = false;
+						if (_mp.Fullscreen)
+							_mp.Fullscreen = false;
 
-						axWindowsMediaPlayer1.Focus();
+						videoView1.Focus();
 						break;
 				}
 			}
