@@ -69,10 +69,11 @@
 			// videoView1
 			// 
 			this.videoView1.BackColor = System.Drawing.Color.Black;
+			this.videoView1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.videoView1.Location = new System.Drawing.Point(3, 3);
 			this.videoView1.MediaPlayer = null;
 			this.videoView1.Name = "videoView1";
-			this.videoView1.Size = new System.Drawing.Size(75, 23);
+			this.videoView1.Size = new System.Drawing.Size(1014, 666);
 			this.videoView1.TabIndex = 2;
 			this.videoView1.Text = "videoView1";
 			// 
@@ -86,6 +87,7 @@
 			this.KeyPreview = true;
 			this.Name = "PlayerForm";
 			this.Text = "Rama Player";
+			this.Load += new System.EventHandler(this.PlayerForm_Load);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PlayerForm_KeyDown);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();

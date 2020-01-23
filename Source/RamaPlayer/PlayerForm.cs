@@ -17,6 +17,7 @@ namespace RamaPlayer
 	public partial class PlayerForm : Form
 	{
 		private static HashSet<string> mediaExtensions = new HashSet<string>("mp4;mp3;avi;mpeg;wav;wmv".Split(';'), StringComparer.OrdinalIgnoreCase);
+		private readonly string cmdFilePath;
 		private string currentFolder;
 		private List<string> allFiles;
 		private bool imClosing;
@@ -45,6 +46,7 @@ namespace RamaPlayer
 
 		public PlayerForm(string filePath)
 		{
+			this.cmdFilePath = filePath;
 			Core.Initialize();
 
 			this.WindowState = FormWindowState.Maximized;
@@ -59,8 +61,6 @@ namespace RamaPlayer
 			//_mp.stretchToFit = true;
 			videoView1.KeyDown += WM_KeyDownEvent;
 			_mp.TimeChanged += Media_TimeChange;
-			if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
-				InitializeNewLocation(filePath);
 
 			this.FormClosing += PlayerForm_FormClosing;
 			statusUpdateWorker = Task.Factory.StartNew(() =>
@@ -128,7 +128,7 @@ namespace RamaPlayer
 					case VLCState.Ended:
 						if (isRepeating)
 						{
-							_mp.Play();
+							StartPlaying();
 						}
 						else
 						{
@@ -216,7 +216,11 @@ namespace RamaPlayer
 			lock (this)
 			{
 				this.Text = this.CurrentFile + " Rama Player";
-				_mp.Media = null;
+				if (_mp.Media != null)
+				{
+					_mp.Media.Dispose();
+				}
+
 				var media = new Media(_libVLC, $@"{this.currentFolder}\{this.CurrentFile}", FromType.FromPath);
 				media.StateChanged += Media_StateChanged;
 				_mp.Media = media;
@@ -308,6 +312,12 @@ namespace RamaPlayer
 					isRepeating = !isRepeating;
 					break;
 			}
+		}
+
+		private void PlayerForm_Load(object sender, EventArgs e)
+		{
+			if (!string.IsNullOrEmpty(cmdFilePath) && File.Exists(cmdFilePath))
+				InitializeNewLocation(cmdFilePath);
 		}
 	}
 
