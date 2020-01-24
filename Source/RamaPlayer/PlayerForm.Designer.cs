@@ -52,7 +52,7 @@
 			this.tableLayoutPanel1.RowCount = 3;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(1020, 742);
 			this.tableLayoutPanel1.TabIndex = 1;
 			// 
@@ -60,7 +60,7 @@
 			// 
 			this.StatusLabel.AutoSize = true;
 			this.StatusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.StatusLabel.Location = new System.Drawing.Point(3, 672);
+			this.StatusLabel.Location = new System.Drawing.Point(3, 652);
 			this.StatusLabel.Name = "StatusLabel";
 			this.StatusLabel.Size = new System.Drawing.Size(1014, 50);
 			this.StatusLabel.TabIndex = 1;
@@ -73,7 +73,7 @@
 			this.videoView1.Location = new System.Drawing.Point(3, 3);
 			this.videoView1.MediaPlayer = null;
 			this.videoView1.Name = "videoView1";
-			this.videoView1.Size = new System.Drawing.Size(1014, 666);
+			this.videoView1.Size = new System.Drawing.Size(1014, 646);
 			this.videoView1.TabIndex = 2;
 			this.videoView1.Text = "videoView1";
 			// 

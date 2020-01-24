@@ -264,10 +264,7 @@ namespace RamaPlayer
 
 					case Keys.P:
 					case Keys.Space:
-						if (_mp.State == VLCState.Playing)
-							_mp.Pause();
-						else
-							_mp.Play();
+						_mp.SetPause(_mp.State == VLCState.Playing);
 						break;
 
 					case Keys.W:
@@ -328,13 +325,13 @@ namespace RamaPlayer
 		public bool Shift { get; private set; }
 		public Keys KeyCode { get; private set; }
 
-		public KeyInputEventArgs(AxWMPLib._WMPOCXEvents_KeyDownEvent e)
-		{
-			this.KeyCode = (Keys)e.nKeyCode;
-			this.Shift = (e.nShiftState & 1) == 1;
-			this.Control = (e.nShiftState & 2) == 2;
-			this.Alt = (e.nShiftState & 4) == 4;
-		}
+		//public KeyInputEventArgs(AxWMPLib._WMPOCXEvents_KeyDownEvent e)
+		//{
+		//	this.KeyCode = (Keys)e.nKeyCode;
+		//	this.Shift = (e.nShiftState & 1) == 1;
+		//	this.Control = (e.nShiftState & 2) == 2;
+		//	this.Alt = (e.nShiftState & 4) == 4;
+		//}
 
 		public KeyInputEventArgs(PreviewKeyDownEventArgs e)
 		{
