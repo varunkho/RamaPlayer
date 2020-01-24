@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -63,19 +64,18 @@ namespace RamaPlayer
 			this.FormClosing += PlayerForm_FormClosing;
 			this.StatusLabel.TextChanged += (s, e) => videoView1.AccessibleDescription = StatusLabel.Text;
 
-			statusUpdateWorker = Task.Factory.StartNew(() =>
-				{
-					return;
-					while (!imClosing)
-					{
-						Thread.Sleep(200);
-						try
-						{
-							Media_TimeChange(null, null);
-						}
-						catch (Exception Exception) { }
-					}
-				});
+			//statusUpdateWorker = Task.Factory.StartNew(() =>
+			//	{
+			//		while (!imClosing)
+			//		{
+			//			Thread.Sleep(200);
+			//			try
+			//			{
+			//				Media_TimeChange(null, null);
+			//			}
+			//			catch (Exception Exception) { }
+			//		}
+			//	});
 		}
 
 		void PlayerForm_KeyDown(object sender, KeyEventArgs e)
@@ -96,7 +96,7 @@ namespace RamaPlayer
 				_mp.Fullscreen = false;
 			}
 
-			statusUpdateWorker.Wait(500);
+			//statusUpdateWorker.Wait(500);
 			Application.DoEvents();
 		}
 
@@ -315,7 +315,32 @@ namespace RamaPlayer
 				case Keys.R:
 					isRepeating = !isRepeating;
 					break;
+
+				case Keys.G:
+					var input = InputForm.Ask("Go to Time", ParseTime);
+					if (input.result == DialogResult.OK)
+					{
+						_mp.Time = (int)input.value.TotalSeconds * 1000;
+					}
+					break;
 			}
+		}
+
+		private TimeSpan ParseTime(string value)
+		{
+			var formats = new[]
+			{
+				"h:m:s",
+				"h:m"
+			};
+
+			var time = DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
+				? result.TimeOfDay : throw new InvalidOperationException("Invalid time format. Either h:m or h:m:s");
+
+			if ((time.TotalSeconds * 1000) > _mp.Length)
+				throw new InvalidOperationException($"Out of duration");
+
+			return time;
 		}
 
 		private void PlayerForm_Load(object sender, EventArgs e)
