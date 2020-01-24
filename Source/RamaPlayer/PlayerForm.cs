@@ -48,10 +48,8 @@ namespace RamaPlayer
 		{
 			this.cmdFilePath = filePath;
 			Core.Initialize();
-
 			this.WindowState = FormWindowState.Maximized;
 			InitializeComponent();
-
 
 			_libVLC = new LibVLC();
 			_mp = new MediaPlayer(_libVLC);
@@ -63,6 +61,8 @@ namespace RamaPlayer
 			_mp.TimeChanged += Media_TimeChange;
 
 			this.FormClosing += PlayerForm_FormClosing;
+			this.StatusLabel.TextChanged += (s, e) => videoView1.AccessibleDescription = StatusLabel.Text;
+
 			statusUpdateWorker = Task.Factory.StartNew(() =>
 				{
 					return;
@@ -252,11 +252,17 @@ namespace RamaPlayer
 						break;
 
 					case Keys.Up:
-						_mp.Volume += 1;
+						if (e.Shift)
+							_mp.SetRate(_mp.Rate + 1);
+						else
+							_mp.Volume += 1;
 						break;
 					case Keys.Down:
-						_mp.Volume -= 1;
-						break;
+						if (e.Shift)
+							_mp.SetRate(_mp.Rate - 1);
+						else
+							_mp.Volume -= 1;
+						break;	
 
 					case Keys.M:
 						_mp.Mute = !_mp.Mute;
@@ -277,16 +283,16 @@ namespace RamaPlayer
 						_mp.Time = 0;
 						break;
 					case Keys.End:
-						_mp.Time = _mp.Length;
+						if (e.Shift)
+							_mp.Time = _mp.Length - 2500;
+						else
+							_mp.Time = _mp.Length;
 						break;
 
 					case Keys.F:
-						if (_mp.State == VLCState.Playing || _mp.State == VLCState.Paused)
-						{
-							_mp.Fullscreen = !_mp.Fullscreen;
-							// Focussing was primarily intended as fullscreen is turned off; however, it did the trick for arrow keys not functioning in fullscreen mode! Preview keydown rocks!
-							videoView1.Focus();
-						}
+						_mp.ToggleFullscreen();
+						// Focussing was primarily intended as fullscreen is turned off; however, it did the trick for arrow keys not functioning in fullscreen mode! Preview keydown rocks!
+						videoView1.Focus();
 						break;
 					case Keys.Escape:
 						if (_mp.Fullscreen)
@@ -294,6 +300,7 @@ namespace RamaPlayer
 
 						videoView1.Focus();
 						break;
+
 				}
 			}
 
