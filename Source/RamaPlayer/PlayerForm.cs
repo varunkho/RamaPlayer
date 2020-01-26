@@ -119,11 +119,11 @@ namespace RamaPlayer
 			StatusLabel.BeginInvoke(new Action(() => StatusLabel.Text = status));
 		}
 
-		void Media_StateChanged(object sender, LibVLCSharp.Shared.MediaStateChangedEventArgs e)
+		void Media_StateChanged(object sender, EventArgs e)
 		{
 			BeginInvoke(new Action(() =>
 			{
-				switch (e.State)
+				switch (_mp.State)
 				{
 					case VLCState.Ended:
 						if (isRepeating)
@@ -222,7 +222,8 @@ namespace RamaPlayer
 				}
 
 				var media = new Media(_libVLC, $@"{this.currentFolder}\{this.CurrentFile}", FromType.FromPath);
-				media.StateChanged += Media_StateChanged;
+				// stateChanged event causing null ref exception randomly (but frequently) in native lib so not using that
+				_mp.EndReached += Media_StateChanged;
 				_mp.Media = media;
 				_mp.Play();
 				_mp.Mute = false;
