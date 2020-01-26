@@ -262,7 +262,7 @@ namespace RamaPlayer
 							_mp.SetRate(_mp.Rate - 1);
 						else
 							_mp.Volume -= 1;
-						break;	
+						break;
 
 					case Keys.M:
 						_mp.Mute = !_mp.Mute;
@@ -328,14 +328,21 @@ namespace RamaPlayer
 
 		private TimeSpan ParseTime(string value)
 		{
-			var formats = new[]
+			TimeSpan time;
+			if (int.TryParse(value, out var minutes))
+				time = TimeSpan.FromMinutes(minutes);
+			else
 			{
+				var formats = new[]
+				{
 				"h:m:s",
-				"h:m"
+				"h:m",
+				"m-s"
 			};
 
-			var time = DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
-				? result.TimeOfDay : throw new InvalidOperationException("Invalid time format. Either h:m or h:m:s");
+				time = DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
+					? result.TimeOfDay : throw new InvalidOperationException("Invalid time format. Either h:m or h:m:s");
+			}
 
 			if ((time.TotalSeconds * 1000) > _mp.Length)
 				throw new InvalidOperationException($"Out of duration");
