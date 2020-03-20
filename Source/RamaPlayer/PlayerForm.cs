@@ -338,7 +338,9 @@ namespace RamaPlayer
 				{
 				"h:m:s",
 				"h:m",
-				"m-s"
+				"h:m:s.fff",
+				"m-s",
+				"m-s.fff",
 			};
 
 				time = DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
