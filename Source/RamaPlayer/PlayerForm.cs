@@ -105,7 +105,7 @@ namespace RamaPlayer
 			string status = "";
 			if (_mp.Media != null && _mp.Length > 0)
 			{
-				status = string.Format("{0:H:m:s} ({1}% of {2:H:mm:ss}) {3}",
+				status = string.Format("{0:H:m:s.fff} ({1}% of {2:H:mm:ss}) {3}",
 					new DateTime(TimeSpan.FromMilliseconds(_mp.Time).Ticks),
 					_mp.Time == 0 ? 0 : (int)(_mp.Time / (_mp.Length / 100)),
 					new DateTime(TimeSpan.FromMilliseconds(_mp.Length).Ticks),
