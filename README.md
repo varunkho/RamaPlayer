@@ -27,7 +27,7 @@ Keyboard Commands
 - alt + left/right arrows to rewind/forward, respectively by 15 seconds
 - ctrl + left/right arrows to rewind/forward, respectively by 40 seconds
 - ctrl + shift + left/right arrows to rewind/forward, respectively by a minute
-- pageup/pagedown  to rewind/forward, respectively by 20 percent of the total duration of the track. So if track duration is 40 minutes one pagedown advances current position by 10 minutes. For a 20 minutes track, the same will be advanced by 5 minutes
+- pageup/pagedown  to rewind/forward, respectively by 20 percent of the total duration of the track. So if track duration is 50 minutes one pagedown advances current position by 10 minutes. For a 20 minutes track, the same will be advanced by 4 minutes
 - r to set/unset repeat (if set the current track is played in a loop until you quit or change)
 - home to go to beginning of the track
 - end to go to the end of the track
@@ -39,3 +39,15 @@ Keyboard Commands
     - h:m:s.fff - accurate (upto milliseconds) hours:minutes:seconds.milliseconds time format
     - m-s - minutes-seconds time format (using hyphen as a separator rather than colon)
     - m-s.fff - minutes-seconds.milliseconds time format
+    
+Chrome Extension
+--------------------
+
+Under the Chrome folder in the repository, there's a source for a Chrome extension  that makes any web video player on any webpage you open on Chrome as RamaPlayer. I.E., it adds keyboard shortcuts to operate the player. It currently works on the \<video\> elements.
+
+Following keyboard shortcuts are supported:
+- alt+1 to switch to the Pause button
+- alt+2 to click on Skip Ads button (on Youtube player)
+- ctrl + left/right arrows to rewind/forward, respectively by 30 seconds
+- ctrl + shift + left/right arrows to rewind/forward, respectively by 1.5 minutes (90 seconds)
+- pageup/pagedown  to rewind/forward, respectively by 20 percent of the total duration of the track. So if track duration is 50 minutes one pagedown advances current position by 10 minutes. For a 20 minutes track, the same will be advanced by 4 minutes
