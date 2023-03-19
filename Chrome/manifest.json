@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "RamaVideoPlayer",
+  "version": "1.0",
+  "description": "Control HTML5 video player with keyboard shortcuts.",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  }
+}
