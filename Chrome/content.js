@@ -4,6 +4,7 @@ var leftArrow = 37;
 var rightArrow = 39;
 var one = 49;
 var two = 50;
+var three = 51;
 var ctrl = 17;
 
 document.addEventListener('keydown', function(event) {
@@ -23,8 +24,11 @@ currentVideo.currentTime += (event.shiftKey ? 90 : 30);
 var element = getButtonElementByText('Pause');
 element.focus();
 } else if (event.keyCode == two && event.altKey) {
-var element = getButtonElementByText('Skip Ads');
+var element = getButtonElementByText('Skip Ad');
 element.click();
+} else if (event.keyCode == three && event.altKey) {
+var element = getButtonElementByText('like this video');
+element.focus();
 
 }
 });
