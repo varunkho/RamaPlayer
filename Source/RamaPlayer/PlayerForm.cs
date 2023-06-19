@@ -254,13 +254,13 @@ namespace RamaPlayer
 
 					case Keys.Up:
 						if (e.Shift)
-							_mp.SetRate(_mp.Rate + 1);
+							_mp.SetRate(_mp.Rate + 0.1f);
 						else
 							_mp.Volume += 1;
 						break;
 					case Keys.Down:
 						if (e.Shift)
-							_mp.SetRate(_mp.Rate - 1);
+							_mp.SetRate(_mp.Rate - 0.1f);
 						else
 							_mp.Volume -= 1;
 						break;
