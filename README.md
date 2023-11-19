@@ -46,8 +46,16 @@ Chrome Extension
 Under the Chrome folder in the repository, there's a source for a Chrome extension  that makes any web video player on any webpage you open on Chrome as RamaPlayer. I.E., it adds keyboard shortcuts to operate the player. It currently works on the \<video\> elements.
 
 Following keyboard shortcuts are supported:
-- alt+1 to switch to the Pause button
+(Note: most of these shortcuts which are related to manipulating the video element work only when the video element is in playing mode)
+- alt+1 to switch to the Pause/Play button
 - alt+2 to click on Skip Ads button (on Youtube player)
+- ctrl + shift + end to set video's 'seek position' at 100% (useful to skip Youtube ads when Skip Ads button isn't available)
+- alt + up arrow opens up a dialog to increase audio volume by specified times (2 = 100% * 2, for example). It only works once on a video instance which means you've to refresh the page to apply greater volume. Works amazingly to go far beyond 100% volume otherwise possible with volume controls. Necessary for certain videos which have low max volume.
+- alt + 3 focus on Like button for Youtube videos.
+- alt + shift + 3 focus and clicked Like button for Youtube videos.
 - ctrl + left/right arrows to rewind/forward, respectively by 30 seconds
 - ctrl + shift + left/right arrows to rewind/forward, respectively by 1.5 minutes (90 seconds)
-- pageup/pagedown  to rewind/forward, respectively by 20 percent of the total duration of the track. So if track duration is 50 minutes one pagedown advances current position by 10 minutes. For a 20 minutes track, the same will be advanced by 4 minutes
+- pagedown/pageup to rewind/forward, respectively by 20 percent of the total duration of the track. So if track duration is 50 minutes one pagedown advances current position by 10 minutes. For a 20 minutes track, the same will be advanced by 4 minutes
+- alt + pagedown/pageup to rewind/forward, respectively by 5 minutes
+- alt + g to open go to position dialog to navigate to a precise position (by minutes) in the current video
+
