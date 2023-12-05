@@ -60,6 +60,7 @@ namespace RamaPlayer
 			//_mp.stretchToFit = true;
 			videoView1.KeyDown += WM_KeyDownEvent;
 			_mp.TimeChanged += Media_TimeChange;
+			_mp.EndReached += Media_StateChanged;
 
 			this.FormClosing += PlayerForm_FormClosing;
 			this.StatusLabel.TextChanged += (s, e) => videoView1.AccessibleDescription = StatusLabel.Text;
@@ -94,6 +95,12 @@ namespace RamaPlayer
 			if (_mp.Fullscreen)
 			{
 				_mp.Fullscreen = false;
+			}
+
+			if (_mp.Media != null)
+			{
+				_mp.Stop();
+				_mp.Media.Dispose();
 			}
 
 			//statusUpdateWorker.Wait(500);
@@ -218,12 +225,11 @@ namespace RamaPlayer
 				this.Text = this.CurrentFile + " Rama Player";
 				if (_mp.Media != null)
 				{
+					_mp.Stop();
 					_mp.Media.Dispose();
 				}
 
 				var media = new Media(_libVLC, $@"{this.currentFolder}\{this.CurrentFile}", FromType.FromPath);
-				// stateChanged event causing null ref exception randomly (but frequently) in native lib so not using that
-				_mp.EndReached += Media_StateChanged;
 				_mp.Media = media;
 				_mp.Play();
 				_mp.Mute = false;
